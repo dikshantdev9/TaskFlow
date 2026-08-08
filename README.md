@@ -201,24 +201,6 @@ node server.js
 
 Open <http://localhost:5000> — Express serves the `frontend/` folder statically, so there is no second server to start.
 
-### `.env`
-
-```env
-PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/taskflow
-USE_MEMORY_DB=false
-JWT_SECRET=change_me_to_a_long_random_string
-JWT_EXPIRES_IN=30d
-SEED_DEMO=false
-```
-
-- **Real MongoDB** — set `MONGO_URI` (local or an Atlas SRV string) and `USE_MEMORY_DB=false`.
-- **No MongoDB installed** — set `USE_MEMORY_DB=true` and the server boots an in-process `mongodb-memory-server`. Handy for a first run; data resets when the process stops.
-- **Demo data** — `SEED_DEMO=true` seeds `demo@taskflow.app` / `demo1234` with five tasks and about a month of subtask history.
-
-Never commit a real `.env`; `.gitignore` already excludes it.
-
----
 
 ## How progress is calculated
 
