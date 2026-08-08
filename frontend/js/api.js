@@ -9,7 +9,7 @@
  * If you host the frontend separately, set window.TASKFLOW_API before
  * this script runs, e.g. <script>window.TASKFLOW_API='http://localhost:5000/api'</script>
  */
-const PROXY = '__PORT_5000__';
+const PROXY = 'http://localhost:5000';
 const API_BASE = (
   window.TASKFLOW_API ||
   // Served by the same Express process locally; behind a preview proxy the
