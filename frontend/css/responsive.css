@@ -1,0 +1,240 @@
+/* ============================================================
+   Responsive — tablet & mobile
+   ============================================================ */
+
+@media (max-width: 1180px) {
+  .dash-grid {
+    grid-template-columns: 1fr;
+  }
+  .task-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-w: 240px;
+  }
+  .search-box {
+    max-width: 260px;
+  }
+}
+
+/* ---------------- mobile: collapsible sidebar ---------------- */
+@media (max-width: 860px) {
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: var(--shadow-lg);
+    width: 272px;
+  }
+  .sidebar.open {
+    transform: none;
+  }
+  .main {
+    margin-left: 0;
+  }
+  .menu-toggle {
+    display: inline-grid;
+  }
+  .scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    background: rgba(9, 14, 11, 0.5);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 240ms var(--ease-out);
+  }
+  .scrim.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .topbar {
+    padding: 0 var(--space-4);
+    gap: var(--space-2);
+  }
+  .topbar h1 {
+    font-size: var(--text-base);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .topbar-sub {
+    display: none;
+  }
+  .search-box {
+    max-width: none;
+  }
+  .page {
+    padding: var(--space-4);
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+  .stat {
+    padding: var(--space-4);
+  }
+  .stat-value {
+    font-size: 1.6rem;
+  }
+
+  .task-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .toast-stack {
+    left: var(--space-4);
+    right: var(--space-4);
+    bottom: var(--space-4);
+  }
+  .toast {
+    min-width: 0;
+    max-width: none;
+  }
+
+  .modal {
+    width: 100%;
+    max-height: 92dvh;
+  }
+  .modal-body,
+  .modal-head,
+  .modal-foot {
+    padding-inline: var(--space-4);
+  }
+
+  .popover {
+    width: min(320px, calc(100vw - 32px));
+  }
+
+  /* Calendar becomes a compact grid */
+  .cal-cell {
+    min-height: 76px;
+    padding: 4px;
+  }
+  .cal-pill {
+    padding: 2px 5px;
+    font-size: 0.625rem;
+  }
+  .cal-date {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* Auth: single column */
+  .auth {
+    grid-template-columns: 1fr;
+  }
+  .auth-aside {
+    display: none;
+  }
+  .auth-card .mobile-brand {
+    display: flex;
+  }
+  .auth-main {
+    padding: var(--space-6) var(--space-5);
+    align-items: start;
+    padding-top: var(--space-12);
+  }
+}
+
+@media (max-width: 560px) {
+  /* Topbar: the page title moves into the page body, so free the room
+     for the search field and the primary action. */
+  .topbar h1 {
+    display: none;
+  }
+  .topbar .btn .label {
+    display: none;
+  }
+  .topbar {
+    gap: var(--space-1);
+  }
+  .topbar .search-box {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .topbar .btn {
+    padding-inline: var(--space-3);
+  }
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stat-value {
+    font-size: 1.45rem;
+  }
+  .stat {
+    padding: var(--space-3) var(--space-4);
+  }
+  .greeting h2 {
+    font-size: var(--text-lg);
+  }
+  .greeting {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+  .toolbar {
+    gap: var(--space-2);
+  }
+  .toolbar .select-sm {
+    flex: 1;
+    min-width: 0;
+  }
+  .cal-pill span {
+    display: none;
+  }
+  .cal-cell {
+    min-height: 62px;
+  }
+  .profile-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .quick-add .input[type='date'] {
+    flex: 1 1 100%;
+  }
+  .donut-wrap {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .donut {
+    margin: 0 auto;
+  }
+  .detail-item {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+  .detail-item .v {
+    text-align: left;
+  }
+}
+
+/* Print — clean task export */
+@media print {
+  .sidebar,
+  .topbar,
+  .toolbar,
+  .quick-add,
+  .toast-stack,
+  .icon-btn,
+  .btn {
+    display: none !important;
+  }
+  .main {
+    margin-left: 0;
+  }
+  .card,
+  .task-hero {
+    box-shadow: none;
+    border-color: #ccc;
+  }
+}

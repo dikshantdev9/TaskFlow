@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create your account — TaskFlow</title>
+    <meta name="description" content="Create a free TaskFlow account and start turning goals into date-wise subtasks with automatic progress tracking." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230F7A52' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M4 7h9M4 12h13M4 17h7'/%3E%3Cpath d='M15.5 18.5l2 2 4-4.5'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/login.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      (function () {
+        try {
+          var raw = localStorage.getItem('taskflow') || (window.name.startsWith('{') ? window.name : '{}');
+          var pref = (JSON.parse(raw) || {}).theme || 'system';
+          var dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <button class="icon-btn auth-theme" data-theme-toggle aria-label="Toggle theme"></button>
+
+    <div class="auth">
+      <aside class="auth-aside">
+        <div class="auth-brand">
+          <span class="brand-mark" id="asideMark"></span>
+          <span class="brand-name">TaskFlow</span>
+        </div>
+
+        <div class="auth-pitch">
+          <h2>Progress you can actually see.</h2>
+          <p>
+            Every subtask you tick moves the bar. Every day you show up extends your streak. TaskFlow keeps the
+            whole picture in one calm dashboard.
+          </p>
+
+          <div class="pitch-card" aria-hidden="true">
+            <div class="pc-title">Ship TaskFlow v1.0</div>
+            <div class="pc-row done"><span class="pc-check" id="pc1"></span><span>Finalise the dashboard</span></div>
+            <div class="pc-row done"><span class="pc-check" id="pc2"></span><span>Write the analytics charts</span></div>
+            <div class="pc-row done"><span class="pc-check" id="pc3"></span><span>Mobile responsive pass</span></div>
+            <div class="pc-row"><span class="pc-check"></span><span>Accessibility audit</span></div>
+            <div class="pc-row"><span class="pc-check"></span><span>Write the README</span></div>
+            <div class="pc-bar"><i></i></div>
+            <div class="pc-meta"><span>3 of 5 done</span><span>60%</span></div>
+          </div>
+        </div>
+
+        <p class="auth-foot">Free forever. Your data stays yours — export it any time.</p>
+      </aside>
+
+      <main class="auth-main">
+        <div class="auth-card">
+          <div class="mobile-brand">
+            <span class="brand-mark" id="mobileMark"></span>
+            <span class="brand-name" style="color: var(--text)">TaskFlow</span>
+          </div>
+
+          <h1>Create your account</h1>
+          <p class="sub">Takes about twenty seconds.</p>
+
+          <form class="auth-form" id="signupForm" novalidate>
+            <div class="form-alert hidden" id="formAlert"></div>
+
+            <div class="field">
+              <label class="label" for="name">Full name</label>
+              <input class="input" type="text" id="name" name="name" autocomplete="name" placeholder="Dikshant Gaikwad" required />
+            </div>
+
+            <div class="field">
+              <label class="label" for="email">Email address</label>
+              <input class="input" type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="field">
+              <label class="label" for="password">Password</label>
+              <div class="pw-wrap">
+                <input class="input" type="password" id="password" name="password" autocomplete="new-password" placeholder="At least 6 characters" required />
+                <button type="button" class="pw-toggle" data-pw-toggle="password" aria-label="Show password"></button>
+              </div>
+              <div class="strength" id="strength" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+              <span class="field-hint" id="strengthText">Use 8+ characters with a number for a stronger password.</span>
+            </div>
+
+            <div class="field">
+              <label class="label" for="confirm">Confirm password</label>
+              <div class="pw-wrap">
+                <input class="input" type="password" id="confirm" name="confirm" autocomplete="new-password" placeholder="Repeat your password" required />
+                <button type="button" class="pw-toggle" data-pw-toggle="confirm" aria-label="Show password"></button>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-block" type="submit" id="submitBtn" style="height: 46px">Create account</button>
+          </form>
+
+          <p class="auth-alt">Already have an account? <a href="index.html">Sign in</a></p>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+  </body>
+</html>

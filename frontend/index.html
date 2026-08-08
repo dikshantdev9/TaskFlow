@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in — TaskFlow | Smart Task &amp; Progress Management</title>
+    <meta name="description" content="TaskFlow turns big goals into date-wise subtasks and tracks your completion percentage automatically. Sign in to your productivity dashboard." />
+    <meta property="og:title" content="TaskFlow — Smart Task & Progress Management" />
+    <meta property="og:description" content="Break goals into date-wise subtasks, tick them off, and watch your progress bar fill." />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230F7A52' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M4 7h9M4 12h13M4 17h7'/%3E%3Cpath d='M15.5 18.5l2 2 4-4.5'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/login.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    <script>
+      // Apply the saved theme before first paint to avoid a flash.
+      (function () {
+        try {
+          var raw = localStorage.getItem('taskflow') || (window.name.startsWith('{') ? window.name : '{}');
+          var pref = (JSON.parse(raw) || {}).theme || 'system';
+          var dark = pref === 'dark' || (pref === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <button class="icon-btn auth-theme" data-theme-toggle aria-label="Toggle theme"></button>
+
+    <div class="auth">
+      <!-- Brand panel -->
+      <aside class="auth-aside">
+        <div class="auth-brand">
+          <span class="brand-mark" id="asideMark"></span>
+          <span class="brand-name">TaskFlow</span>
+        </div>
+
+        <div class="auth-pitch">
+          <h2>Big goals, one day at a time.</h2>
+          <p>
+            Create a main task, break it into date-wise subtasks, and tick them off. TaskFlow calculates your
+            completion percentage automatically and keeps your streak alive.
+          </p>
+
+          <div class="pitch-card" aria-hidden="true">
+            <div class="pc-title">Learn Full Stack Development</div>
+            <div class="pc-row done"><span class="pc-check" id="pc1"></span><span>Aug 8 — Learn HTML</span></div>
+            <div class="pc-row done"><span class="pc-check" id="pc2"></span><span>Aug 9 — Learn CSS</span></div>
+            <div class="pc-row done"><span class="pc-check" id="pc3"></span><span>Aug 10 — Learn JavaScript</span></div>
+            <div class="pc-row"><span class="pc-check"></span><span>Aug 11 — Learn Node.js</span></div>
+            <div class="pc-row"><span class="pc-check"></span><span>Aug 12 — Build a project</span></div>
+            <div class="pc-bar"><i></i></div>
+            <div class="pc-meta"><span>3 of 5 done</span><span>60%</span></div>
+          </div>
+        </div>
+
+        <p class="auth-foot">Your tasks, subtasks and progress are stored permanently in MongoDB.</p>
+      </aside>
+
+      <!-- Form panel -->
+      <main class="auth-main">
+        <div class="auth-card">
+          <div class="mobile-brand">
+            <span class="brand-mark" id="mobileMark"></span>
+            <span class="brand-name" style="color: var(--text)">TaskFlow</span>
+          </div>
+
+          <h1>Welcome back</h1>
+          <p class="sub">Sign in to pick up where you left off.</p>
+
+          <form class="auth-form" id="loginForm" novalidate>
+            <div class="form-alert hidden" id="formAlert"></div>
+
+            <div class="field">
+              <label class="label" for="email">Email address</label>
+              <input class="input" type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="field">
+              <label class="label" for="password">Password</label>
+              <div class="pw-wrap">
+                <input class="input" type="password" id="password" name="password" autocomplete="current-password" placeholder="••••••••" required />
+                <button type="button" class="pw-toggle" data-pw-toggle="password" aria-label="Show password"></button>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-block" type="submit" id="submitBtn" style="height: 46px">Sign in</button>
+          </form>
+
+          <div class="divider-or">or</div>
+
+          <button class="btn btn-secondary btn-block" id="demoBtn" style="height: 46px">Try the demo account</button>
+
+          <div class="demo-note" style="margin-top: var(--space-4)">
+            <span id="noteIcon"></span>
+            <span>Demo credentials: <b>demo@taskflow.app</b> / <b>demo1234</b> — preloaded with a month of real activity.</span>
+          </div>
+
+          <p class="auth-alt">Don't have an account? <a href="signup.html">Create one free</a></p>
+        </div>
+      </main>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+  </body>
+</html>
