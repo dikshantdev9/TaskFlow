@@ -12,9 +12,7 @@
 const PROXY = 'http://localhost:5000';
 const API_BASE = (
   window.TASKFLOW_API ||
-  // Served by the same Express process locally; behind a preview proxy the
-  // PROXY token is rewritten to the forwarded path at deploy time.
-  (PROXY.startsWith('__') ? `${location.origin}/api` : `${PROXY}/api`)
+  `${location.origin}/api`
 ).replace(/\/$/, '');
 
 /* -------------------------------------------------- storage --
@@ -188,3 +186,5 @@ const API = {
   exportData: () => API.get('/users/export'),
   deleteAccount: () => API.del('/users/account'),
 };
+
+

@@ -43,17 +43,50 @@ app.use(notFound);
 app.use(errorHandler);
 
 /* ---------------------------------------------------------------- startup */
-(async () => {
-  try {
-    await connectDB();
-    if (process.env.SEED_DEMO === 'true') await require('./seed')();
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`[server] TaskFlow running on http://localhost:${PORT}`);
-    });
-  } catch (err) {
-    console.error('[server] Failed to start:', err);
-    process.exit(1);
+// Database connection
+let dbPromise;
+
+function connectDatabase() {
+  if (!dbPromise) {
+    dbPromise = connectDB();
   }
-})();
+  return dbPromise;
+}
+
+// Vercel / serverless request handler
+app.use(async (req, res, next) => {
+  try {
+    await connectDatabase();
+    next();
+  } catch (err) {
+    console.error('[db] Connection failed:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Database connection failed'
+    });
+  }
+});
+
+// Local development server
+if (require.main === module) {
+  (async () => {
+    try {
+      await connectDatabase();
+
+      if (process.env.SEED_DEMO === 'true') {
+        await require('./seed')();
+      }
+
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(
+          `[server] TaskFlow running on http://localhost:${PORT}`
+        );
+      });
+    } catch (err) {
+      console.error('[server] Failed to start:', err);
+      process.exit(1);
+    }
+  })();
+}
 
 module.exports = app;
