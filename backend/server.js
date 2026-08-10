@@ -12,62 +12,110 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-/* ------------------------------------------------------------- middleware */
+// -------------------------------------------------------------
+// Middleware
+// -------------------------------------------------------------
+
 app.set('trust proxy', 1);
-app.use(cors({ origin: true, credentials: true }));
+
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Throttle auth endpoints against brute force
+// -------------------------------------------------------------
+// Rate limiting
+// -------------------------------------------------------------
+
 app.use(
   '/api/auth',
-  rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: true, legacyHeaders: false })
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
 );
 
-/* ----------------------------------------------------------------- routes */
-app.get('/api/health', (req, res) => res.json({ success: true, status: 'ok', time: new Date() }));
-
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/tasks', require('./routes/taskRoutes'));
-app.use('/api/subtasks', require('./routes/subtaskRoutes'));
-app.use('/api/users', require('./routes/userRoutes'));
-
-/* --------------------------------------------- serve the frontend as static */
-const FRONTEND = path.join(__dirname, '..', 'frontend');
-app.use(express.static(FRONTEND));
-app.get('/', (req, res) => res.sendFile(path.join(FRONTEND, 'index.html')));
-
-/* ------------------------------------------------------------ error layer */
-app.use(notFound);
-app.use(errorHandler);
-
-/* ---------------------------------------------------------------- startup */
+// -------------------------------------------------------------
 // Database connection
+// Only API requests require MongoDB
+// -------------------------------------------------------------
+
 let dbPromise;
 
 function connectDatabase() {
   if (!dbPromise) {
     dbPromise = connectDB();
   }
+
   return dbPromise;
 }
 
-// Vercel / serverless request handler
-app.use(async (req, res, next) => {
+app.use('/api', async (req, res, next) => {
   try {
     await connectDatabase();
     next();
   } catch (err) {
     console.error('[db] Connection failed:', err);
+
     res.status(500).json({
       success: false,
-      message: 'Database connection failed'
+      message: 'Database connection failed',
+      error:
+        process.env.NODE_ENV === 'development'
+          ? err.message
+          : undefined,
     });
   }
 });
 
-// Local development server
+// -------------------------------------------------------------
+// API routes
+// -------------------------------------------------------------
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'ok',
+    time: new Date(),
+  });
+});
+
+app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/tasks', require('./routes/taskRoutes'));
+app.use('/api/subtasks', require('./routes/subtaskRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+
+// -------------------------------------------------------------
+// Frontend
+// -------------------------------------------------------------
+
+const FRONTEND = path.join(__dirname, '..', 'frontend');
+
+app.use(express.static(FRONTEND));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(FRONTEND, 'index.html'));
+});
+
+// -------------------------------------------------------------
+// Error handling
+// -------------------------------------------------------------
+
+app.use(notFound);
+app.use(errorHandler);
+
+// -------------------------------------------------------------
+// Local development
+// -------------------------------------------------------------
+
 if (require.main === module) {
   (async () => {
     try {
@@ -88,5 +136,9 @@ if (require.main === module) {
     }
   })();
 }
+
+// -------------------------------------------------------------
+// Vercel
+// -------------------------------------------------------------
 
 module.exports = app;
