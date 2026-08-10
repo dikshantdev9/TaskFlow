@@ -9,10 +9,11 @@
  * If you host the frontend separately, set window.TASKFLOW_API before
  * this script runs, e.g. <script>window.TASKFLOW_API='http://localhost:5000/api'</script>
  */
-const PROXY = 'http://localhost:5000';
+const PROXY = '__PORT_5000__';
+
 const API_BASE = (
   window.TASKFLOW_API ||
-  `${location.origin}/api`
+  (PROXY.startsWith('__') ? `${location.origin}/api` : `${PROXY}/api`)
 ).replace(/\/$/, '');
 
 /* -------------------------------------------------- storage --
