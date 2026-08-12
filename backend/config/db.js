@@ -8,36 +8,41 @@ const mongoose = require('mongoose');
  * MongoDB is started instead so the app can run with zero setup.
  */
 async function connectDB() {
-  let uri = process.env.MONGO_URI;
+  const rawUri = String(process.env.MONGO_URI || '').trim();
   const useMemoryEnv = String(process.env.USE_MEMORY_DB || '').toLowerCase();
   const isPlaceholderUri =
-    !uri ||
-    uri.includes('YOUR_CLUSTER') ||
-    uri.includes('your_cluster') ||
-    uri.includes('<') ||
-    uri.includes('>');
+    !rawUri ||
+    /YOUR_CLUSTER|your_cluster|<|>/.test(rawUri) ||
+    rawUri.includes('mongodb.net') && /YOUR_CLUSTER|your_cluster/.test(rawUri);
 
-  if (isPlaceholderUri) {
-    uri = undefined;
-    console.warn('[db] Ignoring placeholder or empty MONGO_URI');
-  }
+  const uri = isPlaceholderUri ? undefined : rawUri;
+  const isProduction = process.env.NODE_ENV === 'production';
 
-  const shouldUseMemoryDB =
-    useMemoryEnv === 'true' ||
-    (!uri && process.env.NODE_ENV === 'production');
-
-  if (!uri && shouldUseMemoryDB) {
-    const { MongoMemoryServer } = require('mongodb-memory-server');
-    const mem = await MongoMemoryServer.create();
-    uri = mem.getUri('taskflow');
-    global.__MEMORY_MONGO__ = mem;
-    console.log('[db] No MONGO_URI found — started in-memory MongoDB');
+  if (isProduction && !uri) {
+    throw new Error(
+      'Production requires a valid MONGO_URI. Set a real MongoDB Atlas URI in Vercel env vars and do not use placeholder values.'
+    );
   }
 
   if (!uri) {
-    throw new Error(
-      'MONGO_URI is not defined. Add it to backend/.env or set USE_MEMORY_DB=true'
-    );
+    if (useMemoryEnv !== 'true') {
+      throw new Error(
+        'MONGO_URI is not defined. For local development set USE_MEMORY_DB=true or configure a valid MongoDB URI.'
+      );
+    }
+
+    const { MongoMemoryServer } = require('mongodb-memory-server');
+    const mem = await MongoMemoryServer.create({
+      binary: { downloadDir: '/tmp/mongo-binaries' },
+    });
+    const memoryUri = mem.getUri('taskflow');
+    global.__MEMORY_MONGO__ = mem;
+    console.log('[db] No MONGO_URI found — started in-memory MongoDB');
+
+    mongoose.set('strictQuery', true);
+    const conn = await mongoose.connect(memoryUri, { autoIndex: true });
+    console.log(`[db] MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
+    return conn;
   }
 
   mongoose.set('strictQuery', true);
