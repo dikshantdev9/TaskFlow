@@ -9,8 +9,12 @@ const mongoose = require('mongoose');
  */
 async function connectDB() {
   let uri = process.env.MONGO_URI;
+  const useMemoryEnv = String(process.env.USE_MEMORY_DB || '').toLowerCase();
+  const shouldUseMemoryDB =
+    useMemoryEnv === 'true' ||
+    (!uri && process.env.NODE_ENV === 'production');
 
-  if (!uri && process.env.USE_MEMORY_DB === 'true') {
+  if (!uri && shouldUseMemoryDB) {
     const { MongoMemoryServer } = require('mongodb-memory-server');
     const mem = await MongoMemoryServer.create();
     uri = mem.getUri('taskflow');
@@ -19,7 +23,9 @@ async function connectDB() {
   }
 
   if (!uri) {
-    throw new Error('MONGO_URI is not defined. Add it to backend/.env');
+    throw new Error(
+      'MONGO_URI is not defined. Add it to backend/.env or set USE_MEMORY_DB=true'
+    );
   }
 
   mongoose.set('strictQuery', true);
