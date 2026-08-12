@@ -10,6 +10,18 @@ const mongoose = require('mongoose');
 async function connectDB() {
   let uri = process.env.MONGO_URI;
   const useMemoryEnv = String(process.env.USE_MEMORY_DB || '').toLowerCase();
+  const isPlaceholderUri =
+    !uri ||
+    uri.includes('YOUR_CLUSTER') ||
+    uri.includes('your_cluster') ||
+    uri.includes('<') ||
+    uri.includes('>');
+
+  if (isPlaceholderUri) {
+    uri = undefined;
+    console.warn('[db] Ignoring placeholder or empty MONGO_URI');
+  }
+
   const shouldUseMemoryDB =
     useMemoryEnv === 'true' ||
     (!uri && process.env.NODE_ENV === 'production');
