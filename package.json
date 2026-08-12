@@ -1,0 +1,11 @@
+{
+  "name": "taskflow",
+  "private": true,
+  "workspaces": [
+    "backend"
+  ],
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "start": "cd backend && npm start"
+  }
+}
