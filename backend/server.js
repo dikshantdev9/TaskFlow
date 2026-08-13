@@ -18,12 +18,17 @@ const PORT = process.env.PORT || 5000;
 
 app.set('trust proxy', 1);
 
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
-);
+// Configure CORS: allow any origin in development, but require an explicit
+// FRONTEND_URL in production. This prevents wide-open CORS in production.
+const corsOptions = {
+  origin:
+    process.env.NODE_ENV === 'production'
+      ? process.env.FRONTEND_URL || false
+      : true,
+  credentials: true,
+};
+app.use(cors(corsOptions));
+console.log('[server] CORS origin:', corsOptions.origin);
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));

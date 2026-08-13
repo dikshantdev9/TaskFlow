@@ -30,14 +30,14 @@ async function connectDB() {
         'MONGO_URI is not defined. For local development set USE_MEMORY_DB=true or configure a valid MongoDB URI.'
       );
     }
-
     const { MongoMemoryServer } = require('mongodb-memory-server');
-    const mem = await MongoMemoryServer.create({
-      binary: { downloadDir: '/tmp/mongo-binaries' },
-    });
+    const os = require('os');
+    const tmp = os.tmpdir();
+    const mem = await MongoMemoryServer.create({ binary: { downloadDir: tmp } });
     const memoryUri = mem.getUri('taskflow');
     global.__MEMORY_MONGO__ = mem;
     console.log('[db] No MONGO_URI found — started in-memory MongoDB');
+    console.log('[db] In-memory MongoDB URI hidden for security');
 
     mongoose.set('strictQuery', true);
     const conn = await mongoose.connect(memoryUri, { autoIndex: true });
@@ -45,6 +45,7 @@ async function connectDB() {
     return conn;
   }
 
+  console.log('[db] Connecting to MongoDB...');
   mongoose.set('strictQuery', true);
   const conn = await mongoose.connect(uri, { autoIndex: true });
   console.log(`[db] MongoDB connected: ${conn.connection.host}/${conn.connection.name}`);
