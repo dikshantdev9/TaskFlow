@@ -6,6 +6,8 @@
   ],
   "scripts": {
     "dev": "cd backend && npm run dev",
-    "start": "cd backend && npm start"
+    "start": "cd backend && npm start",
+    "build": "node -e \"console.log('TaskFlow build step not required for Vercel deployment.')\"",
+    "vercel-build": "npm run build"
   }
 }

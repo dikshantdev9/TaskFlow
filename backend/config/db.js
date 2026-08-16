@@ -13,21 +13,14 @@ async function connectDB() {
   const isPlaceholderUri =
     !rawUri ||
     /YOUR_CLUSTER|your_cluster|<|>/.test(rawUri) ||
-    rawUri.includes('mongodb.net') && /YOUR_CLUSTER|your_cluster/.test(rawUri);
+    (rawUri.includes('mongodb.net') && /YOUR_CLUSTER|your_cluster/.test(rawUri));
 
   const uri = isPlaceholderUri ? undefined : rawUri;
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  if (isProduction && !uri) {
-    throw new Error(
-      'Production requires a valid MONGO_URI. Set a real MongoDB Atlas URI in Vercel env vars and do not use placeholder values.'
-    );
-  }
 
   if (!uri) {
     if (useMemoryEnv !== 'true') {
       throw new Error(
-        'MONGO_URI is not defined. For local development set USE_MEMORY_DB=true or configure a valid MongoDB URI.'
+        'MONGO_URI is not defined and USE_MEMORY_DB is not enabled. Set USE_MEMORY_DB=true for demo deployments or add a valid MongoDB URI.'
       );
     }
     const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -36,7 +29,7 @@ async function connectDB() {
     const mem = await MongoMemoryServer.create({ binary: { downloadDir: tmp } });
     const memoryUri = mem.getUri('taskflow');
     global.__MEMORY_MONGO__ = mem;
-    console.log('[db] No MONGO_URI found — started in-memory MongoDB');
+    console.log('[db] No MONGO_URI configured — started in-memory MongoDB for this deployment');
     console.log('[db] In-memory MongoDB URI hidden for security');
 
     mongoose.set('strictQuery', true);
