@@ -12,31 +12,41 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// -------------------------------------------------------------
-// Middleware
-// -------------------------------------------------------------
+// ============================================================
+// BASIC CONFIGURATION
+// ============================================================
 
 app.set('trust proxy', 1);
 
-// Configure CORS: allow any origin in development, but require an explicit
-// FRONTEND_URL in production. This prevents wide-open CORS in production.
+// ============================================================
+// CORS
+// ============================================================
+
+const allowedOrigin =
+  process.env.NODE_ENV === 'production'
+    ? process.env.FRONTEND_URL || 'https://dikshantdev9.github.io'
+    : true;
+
 const corsOptions = {
-  origin:
-    process.env.NODE_ENV === 'production'
-      ? process.env.FRONTEND_URL || false
-      : true,
+  origin: allowedOrigin,
   credentials: true,
 };
+
 app.use(cors(corsOptions));
-console.log('[server] CORS origin:', corsOptions.origin);
+
+console.log('[server] CORS origin:', allowedOrigin);
+
+// ============================================================
+// BODY PARSING
+// ============================================================
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// -------------------------------------------------------------
-// Rate limiting
-// -------------------------------------------------------------
+// ============================================================
+// RATE LIMITING
+// ============================================================
 
 app.use(
   '/api/auth',
@@ -48,16 +58,45 @@ app.use(
   })
 );
 
-// -------------------------------------------------------------
-// Database connection
-// Only API requests require MongoDB
-// -------------------------------------------------------------
+// ============================================================
+// HEALTH CHECK
+// This does NOT require MongoDB.
+// Useful for Render health checks.
+// ============================================================
 
-let dbPromise;
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: 'ok',
+    message: 'TaskFlow backend is running',
+    time: new Date().toISOString(),
+  });
+});
+
+// Also keep API health endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: 'ok',
+    message: 'TaskFlow API is running',
+    time: new Date().toISOString(),
+  });
+});
+
+// ============================================================
+// DATABASE CONNECTION
+// Only API requests require MongoDB.
+// ============================================================
+
+let dbPromise = null;
 
 function connectDatabase() {
   if (!dbPromise) {
-    dbPromise = connectDB();
+    dbPromise = connectDB().catch((err) => {
+      // Allow another request to retry the connection
+      dbPromise = null;
+      throw err;
+    });
   }
 
   return dbPromise;
@@ -81,26 +120,18 @@ app.use('/api', async (req, res, next) => {
   }
 });
 
-// -------------------------------------------------------------
-// API routes
-// -------------------------------------------------------------
-
-app.get('/api/health', (req, res) => {
-  res.json({
-    success: true,
-    status: 'ok',
-    time: new Date(),
-  });
-});
+// ============================================================
+// API ROUTES
+// ============================================================
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/subtasks', require('./routes/subtaskRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 
-// -------------------------------------------------------------
-// Frontend
-// -------------------------------------------------------------
+// ============================================================
+// FRONTEND
+// ============================================================
 
 const FRONTEND = path.join(__dirname, '..', 'frontend');
 
@@ -110,40 +141,53 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(FRONTEND, 'index.html'));
 });
 
-// -------------------------------------------------------------
-// Error handling
-// -------------------------------------------------------------
+// ============================================================
+// ERROR HANDLING
+// ============================================================
 
 app.use(notFound);
 app.use(errorHandler);
 
-// -------------------------------------------------------------
-// Local development
-// -------------------------------------------------------------
+// ============================================================
+// START SERVER
+// IMPORTANT:
+// Start Express FIRST.
+// MongoDB connection happens separately.
+// This prevents Render from waiting for MongoDB before
+// the HTTP server starts.
+// ============================================================
 
 if (require.main === module) {
-  (async () => {
+  app.listen(PORT, '0.0.0.0', async () => {
+    console.log(
+      `[server] TaskFlow running on port ${PORT}`
+    );
+
     try {
       await connectDatabase();
 
-      if (process.env.SEED_DEMO === 'true') {
-        await require('./seed')();
-      }
+      console.log('[db] MongoDB connected successfully');
 
-      app.listen(PORT, '0.0.0.0', () => {
-        console.log(
-          `[server] TaskFlow running on http://localhost:${PORT}`
-        );
-      });
+      if (process.env.SEED_DEMO === 'true') {
+        console.log('[db] Seeding demo data...');
+        await require('./seed')();
+        console.log('[db] Demo data seeded successfully');
+      }
     } catch (err) {
-      console.error('[server] Failed to start:', err);
-      process.exit(1);
+      console.error(
+        '[db] Initial database connection failed:',
+        err.message
+      );
+
+      console.error(
+        '[db] The server is still running. API requests will retry the database connection.'
+      );
     }
-  })();
+  });
 }
 
-// -------------------------------------------------------------
-// Vercel
-// -------------------------------------------------------------
+// ============================================================
+// VERCEL / SERVERLESS EXPORT
+// ============================================================
 
 module.exports = app;
