@@ -961,9 +961,63 @@ For production deployment, additional protections such as rate limiting, secure 
 
 # 🚀 Production Deployment
 
-Before deploying TaskFlow:
+TaskFlow can be deployed to **Vercel** or any Node.js hosting platform.
 
-### Backend
+## Deploy to Vercel
+
+### Step 1: Connect Your GitHub Repository
+
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Click "New Project"
+4. Select your GitHub repository (TaskFlow)
+5. Vercel will auto-detect the project type
+
+### Step 2: Set Environment Variables
+
+In the Vercel dashboard, add these environment variables:
+
+```env
+NODE_ENV=production
+PORT=5000
+MONGO_URI=mongodb+srv://<user>:<password>@<cluster>.mongodb.net/taskflow
+JWT_SECRET=<generate_a_long_random_secret>
+JWT_EXPIRES_IN=30d
+USE_MEMORY_DB=false
+SEED_DEMO=false
+FRONTEND_URL=https://your-vercel-app.vercel.app
+```
+
+#### Getting a MongoDB URI
+
+1. Create a free account at [MongoDB Atlas](https://www.mongodb.com/cloud/atlas)
+2. Create a new cluster (M0 Free tier)
+3. Create a database user with a strong password
+4. Copy your connection string:
+   ```
+   mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/taskflow?retryWrites=true&w=majority
+   ```
+5. Paste it as `MONGO_URI` in Vercel
+
+#### Generate a JWT Secret
+
+Run this command locally:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+Copy the output and paste it as `JWT_SECRET` in Vercel.
+
+### Step 3: Deploy
+
+Click "Deploy" in the Vercel dashboard. Your app will be live in minutes.
+
+---
+
+## Configuration for Production
+
+### Backend Environment Variables
 
 Configure:
 
@@ -977,7 +1031,7 @@ USE_MEMORY_DB=false
 SEED_DEMO=false
 ```
 
-### Important
+### Important Security Notes
 
 Do not use:
 
@@ -985,9 +1039,7 @@ Do not use:
 JWT_SECRET=change_me_to_a_long_random_string
 ```
 
-in production.
-
-Generate a strong random secret instead.
+in production — generate a strong random secret instead.
 
 Never expose:
 
@@ -998,6 +1050,8 @@ Never expose:
 * Real `.env` files
 
 in the public repository.
+
+Always use Vercel (or your platform's) secure environment variable management for secrets.
 
 ---
 

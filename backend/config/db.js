@@ -19,8 +19,10 @@ async function connectDB() {
 
   if (!uri) {
     if (useMemoryEnv !== 'true') {
+      console.warn('[db] ⚠️  MONGO_URI not configured. For local development, set USE_MEMORY_DB=true.');
+      console.warn('[db] For Vercel/production, configure MONGO_URI in environment variables.');
       throw new Error(
-        'MONGO_URI is not defined and USE_MEMORY_DB is not enabled. Set USE_MEMORY_DB=true for demo deployments or add a valid MongoDB URI.'
+        'MONGO_URI is required for production. Set it in your Vercel environment variables or use USE_MEMORY_DB=true for local development.'
       );
     }
     const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -29,7 +31,7 @@ async function connectDB() {
     const mem = await MongoMemoryServer.create({ binary: { downloadDir: tmp } });
     const memoryUri = mem.getUri('taskflow');
     global.__MEMORY_MONGO__ = mem;
-    console.log('[db] No MONGO_URI configured — started in-memory MongoDB for this deployment');
+    console.log('[db] No MONGO_URI found — started in-memory MongoDB (development only)');
     console.log('[db] In-memory MongoDB URI hidden for security');
 
     mongoose.set('strictQuery', true);
