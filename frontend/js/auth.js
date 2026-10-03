@@ -11,12 +11,59 @@
     const el = document.getElementById(id);
     if (el) el.innerHTML = mark;
   });
-  ['pc1', 'pc2', 'pc3'].forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = icon('check', 12);
-  });
   const noteIcon = document.getElementById('noteIcon');
   if (noteIcon) noteIcon.innerHTML = icon('sparkle', 15);
+
+  // Real-time Dynamic Date Demo Pitch Card
+  (function initRealtimeDemoCard() {
+    const pitchCard = document.querySelector('.pitch-card');
+    if (!pitchCard) return;
+
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    function getDateOffset(offset) {
+      const d = new Date();
+      d.setDate(now.getDate() + offset);
+      return `${months[d.getMonth()]} ${d.getDate()}`;
+    }
+
+    const items = [
+      { title: 'Learn HTML', offset: -2, done: true },
+      { title: 'Learn CSS', offset: -1, done: true },
+      { title: 'Learn JavaScript', offset: 0, done: true, isToday: true },
+      { title: 'Learn Node.js', offset: 1, done: false },
+      { title: 'Build a project', offset: 2, done: false },
+    ];
+
+    let doneCount = 0;
+    let rowsHTML = '';
+
+    items.forEach((item, idx) => {
+      if (item.done) doneCount++;
+      const dateStr = getDateOffset(item.offset);
+      rowsHTML += `
+        <div class="pc-row ${item.done ? 'done' : ''}" style="display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:${item.done ? 'inherit' : '#94a3b8'}">
+          <span class="pc-check" id="pcCheck_${idx}">
+            ${item.done ? icon('check', 11) : ''}
+          </span>
+          <span style="${item.done ? 'text-decoration:line-through;opacity:0.65' : ''}">
+            <b style="font-family:var(--font-mono, monospace);font-weight:700;color:${item.isToday ? '#37c98a' : 'inherit'}">${dateStr}</b> — ${item.title}
+            ${item.isToday ? `<span style="font-size:9.5px;font-weight:800;background:rgba(55,201,138,0.2);color:#37c98a;padding:1px 5px;border-radius:4px;margin-left:4px;text-transform:uppercase;letter-spacing:0.04em">Today</span>` : ''}
+          </span>
+        </div>
+      `;
+    });
+
+    const pct = Math.round((doneCount / items.length) * 100);
+
+    pitchCard.innerHTML = `
+      <div class="pc-title" style="font-weight:700;font-size:13.5px;color:#fff;margin-bottom:8px">Learn Full Stack Development</div>
+      ${rowsHTML}
+      <div class="pc-bar"><i style="width:${pct}%"></i></div>
+      <div class="pc-meta"><span>${doneCount} of ${items.length} done</span><span>${pct}%</span></div>
+    `;
+  })();
 
   // password visibility
   $$('[data-pw-toggle]').forEach((btn) => {
@@ -111,18 +158,21 @@
       clearError();
       const name = $('#name').value.trim();
       const email = $('#email').value.trim();
+      const phoneInput = $('#phone');
+      const phone = phoneInput ? phoneInput.value.trim() : '';
       const password = pw.value;
       const confirm = $('#confirm').value;
 
       if (name.length < 2) return showError('Please enter your full name.');
       if (!/^\S+@\S+\.\S+$/.test(email)) return showError('That email address does not look right.');
+      if (phone && phone.replace(/\D/g, '').length < 8) return showError('Please enter a valid mobile number with at least 8 digits.');
       if (password.length < 6) return showError('Password must be at least 6 characters.');
       if (password !== confirm) return showError('Passwords do not match.');
 
       const btn = $('#submitBtn');
       busy(btn, true, 'Create account');
       try {
-        const { user } = await API.signup({ name, email, password });
+        const { user } = await API.signup({ name, email, phone, password });
         toast(`Account created — welcome, ${user.name.split(' ')[0]}`);
         setTimeout(() => (location.href = 'dashboard.html'), 300);
       } catch (err) {

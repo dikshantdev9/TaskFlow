@@ -23,7 +23,7 @@ exports.getProfile = asyncHandler(async (req, res) => {
 
 // @route PUT /api/users/profile
 exports.updateProfile = asyncHandler(async (req, res) => {
-  const { name, email, bio, avatarColor, timezone } = req.body;
+  const { name, email, phone, bio, avatarColor, timezone } = req.body;
   const user = await User.findById(req.user._id);
 
   if (email && email.toLowerCase() !== user.email) {
@@ -35,6 +35,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     user.email = email.toLowerCase();
   }
   if (name !== undefined) user.name = name;
+  if (phone !== undefined) user.phone = String(phone).trim();
   if (bio !== undefined) user.bio = bio;
   if (avatarColor !== undefined) user.avatarColor = avatarColor;
   if (timezone !== undefined) user.timezone = timezone;
@@ -76,7 +77,7 @@ exports.updateSettings = asyncHandler(async (req, res) => {
   if (s.weekStart) user.settings.weekStart = s.weekStart;
   if (typeof s.compactMode === 'boolean') user.settings.compactMode = s.compactMode;
   if (s.notifications) {
-    ['dueSoon', 'dailyDigest', 'streakReminder'].forEach((k) => {
+    ['dueSoon', 'dailyDigest', 'streakReminder', 'phoneAlerts', 'pendingTaskSms'].forEach((k) => {
       if (typeof s.notifications[k] === 'boolean') user.settings.notifications[k] = s.notifications[k];
     });
   }

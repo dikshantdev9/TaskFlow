@@ -46,6 +46,13 @@
               </div>
             </div>
             <div class="field mt-4">
+              <label class="label" for="pPhone">
+                Mobile Number <span style="font-size:11px;font-weight:700;color:var(--primary);margin-left:4px">📱 For SMS &amp; Task Alerts</span>
+              </label>
+              <input class="input" type="tel" id="pPhone" value="${esc(user.phone || '')}" placeholder="+91 98765 43210" />
+              <span class="field-hint">TaskFlow sends deadline alerts and pending task digests to this phone number.</span>
+            </div>
+            <div class="field mt-4">
               <label class="label" for="pBio">Short bio</label>
               <textarea class="textarea" id="pBio" rows="2" placeholder="What are you working towards?">${esc(user.bio || '')}</textarea>
             </div>
@@ -126,6 +133,7 @@
       const { user: fresh } = await API.updateProfile({
         name: $('#pName').value.trim(),
         email: $('#pEmail').value.trim(),
+        phone: $('#pPhone') ? $('#pPhone').value.trim() : '',
         bio: $('#pBio').value.trim(),
         avatarColor,
       });

@@ -53,6 +53,7 @@ const ICONS = {
   layers: '<path d="M12 2.5L3 7l9 4.5L21 7z"/><path d="M3 12l9 4.5L21 12M3 17l9 4.5L21 17"/>',
   more: '<circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/>',
   sparkle: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>',
+  shield: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
 };
 
 /** Returns an inline SVG string for the given icon name. */
@@ -253,6 +254,7 @@ const NAV_ITEMS = [
 
 const NAV_BOTTOM = [
   { key: 'categories', label: 'Categories', icon: 'folder', href: 'tasks.html?view=categories' },
+  { key: 'pricing', label: 'Upgrade to Pro', icon: 'zap', href: 'pricing.html' },
   { key: 'settings', label: 'Settings', icon: 'settings', href: 'settings.html' },
   { key: 'profile', label: 'Profile', icon: 'user', href: 'profile.html' },
 ];
@@ -269,6 +271,7 @@ function renderShell(cfg) {
   const link = (n) =>
     `<a class="nav-link ${n.key === cfg.active ? 'active' : ''}" href="${n.href}">
        ${icon(n.icon, 18)}<span>${n.label}</span>
+       ${n.key === 'pricing' && user.isPro ? '<span style="margin-left:auto;font-size:10px;font-weight:800;color:#10b981">ACTIVE</span>' : ''}
        <span class="nav-count hidden" data-count="${n.key}"></span>
      </a>`;
 
@@ -287,7 +290,10 @@ function renderShell(cfg) {
         <a class="user-chip" href="profile.html">
           <span class="avatar" style="background:${esc(user.avatarColor || '#0F7A52')}">${esc(initials(user.name))}</span>
           <span class="grow">
-            <span class="name truncate">${esc(user.name || 'Account')}</span>
+            <span class="name truncate" style="display:flex;align-items:center;gap:4px">
+              ${esc(user.name || 'Account')}
+              ${user.isPro ? '<span style="font-size:10px;font-weight:800;background:linear-gradient(135deg,#10b981,#0284c7);color:#fff;padding:1px 6px;border-radius:10px">PRO</span>' : ''}
+            </span>
             <span class="email truncate">${esc(user.email || '')}</span>
           </span>
         </a>
@@ -490,3 +496,42 @@ function emptyState(iconName, title, body, actionHTML) {
       ${actionHTML || ''}
     </div>`;
 }
+
+/** Global Modal to prompt user to upgrade to Pro */
+window.openUpgradeModal = function (featureName = 'This feature') {
+  const existing = document.getElementById('upgradePromptModal');
+  if (existing) existing.remove();
+
+  const m = document.createElement('div');
+  m.id = 'upgradePromptModal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px';
+  m.innerHTML = `
+    <div class="card" style="max-width:440px;width:100%;padding:28px;background:var(--bg-card,#0f172a);border:2px solid #10b981;box-shadow:0 25px 60px rgba(0,0,0,0.8);border-radius:20px;text-align:center">
+      <div style="width:52px;height:52px;border-radius:14px;background:rgba(16,185,129,0.15);color:#10b981;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;border:1px solid rgba(16,185,129,0.3)">
+        ${icon('zap', 28)}
+      </div>
+      <h2 style="font-size:20px;font-weight:800;color:var(--text-bright);margin:0 0 6px 0">Unlock TaskFlow Pro</h2>
+      <p style="font-size:14px;color:var(--text-muted);margin:0 0 20px 0">
+        <b>${esc(featureName)}</b> is an exclusive Pro capability. Upgrade now for full AI breakdowns, unlimited subtasks &amp; deep productivity analytics.
+      </p>
+
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button id="goToPricingBtn" class="btn btn-primary" style="background:#10b981;border-color:#10b981;color:#000;font-weight:800;flex:1;height:42px">
+          View Plans &amp; QR Pay
+        </button>
+        <button id="closeUpgradePromptBtn" class="btn btn-outline" style="height:42px">
+          Maybe Later
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(m);
+
+  document.getElementById('closeUpgradePromptBtn').onclick = () => m.remove();
+  document.getElementById('goToPricingBtn').onclick = () => {
+    location.href = 'pricing.html';
+  };
+  m.onclick = (e) => {
+    if (e.target === m) m.remove();
+  };
+};

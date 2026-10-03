@@ -15,7 +15,7 @@ const DEFAULT_CATEGORIES = [
 
 // @route  POST /api/auth/signup
 exports.signup = asyncHandler(async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, phone } = req.body;
 
   if (!name || !email || !password) {
     res.status(400);
@@ -32,7 +32,20 @@ exports.signup = asyncHandler(async (req, res) => {
     throw new Error('An account with that email already exists');
   }
 
-  const user = await User.create({ name, email, password });
+  // Check if first user or matching admin email
+  const isFirstUser = (await User.countDocuments()) === 0;
+  const adminEmail = process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL.toLowerCase() : null;
+  const role = isFirstUser || (adminEmail && email.toLowerCase() === adminEmail) ? 'admin' : 'user';
+
+  const user = await User.create({
+    name,
+    email,
+    phone: phone ? String(phone).trim() : '',
+    password,
+    role,
+    loginCount: 1,
+    lastLogin: new Date(),
+  });
   await Category.insertMany(DEFAULT_CATEGORIES.map((c) => ({ ...c, user: user._id })));
 
   res.status(201).json({ success: true, token: signToken(user._id), user: user.toPublic() });
@@ -51,6 +64,15 @@ exports.login = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error('Invalid email or password');
   }
+
+  // Update login tracking and promote admin email if applicable
+  const adminEmail = (process.env.ADMIN_EMAIL || 'demo@taskflow.app').toLowerCase();
+  if (user.email.toLowerCase() === adminEmail) {
+    user.role = 'admin';
+  }
+  user.loginCount = (user.loginCount || 0) + 1;
+  user.lastLogin = new Date();
+  await user.save();
 
   res.json({ success: true, token: signToken(user._id), user: user.toPublic() });
 });

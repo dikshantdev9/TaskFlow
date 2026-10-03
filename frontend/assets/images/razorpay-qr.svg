@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 480" width="400" height="480">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f8fafc"/>
+    </linearGradient>
+    <linearGradient id="rzpGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Card Background -->
+  <rect width="400" height="480" rx="20" fill="url(#bgGrad)" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- Top Razorpay / UPI Branding -->
+  <rect x="0" y="0" width="400" height="64" rx="20" fill="#0b132b"/>
+  <rect x="0" y="44" width="400" height="20" fill="#0b132b"/>
+  <text x="200" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">
+    Razorpay • UPI Instant Pay
+  </text>
+
+  <!-- QR Frame -->
+  <rect x="45" y="85" width="310" height="310" rx="16" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+
+  <!-- Stylized High-Tech QR Pattern -->
+  <g fill="#0f172a">
+    <!-- Top-Left Target -->
+    <rect x="70" y="110" width="70" height="70" rx="10" fill="#0f172a"/>
+    <rect x="80" y="120" width="50" height="50" rx="6" fill="#ffffff"/>
+    <rect x="92" y="132" width="26" height="26" rx="4" fill="#0284c7"/>
+
+    <!-- Top-Right Target -->
+    <rect x="260" y="110" width="70" height="70" rx="10" fill="#0f172a"/>
+    <rect x="270" y="120" width="50" height="50" rx="6" fill="#ffffff"/>
+    <rect x="282" y="132" width="26" height="26" rx="4" fill="#0284c7"/>
+
+    <!-- Bottom-Left Target -->
+    <rect x="70" y="300" width="70" height="70" rx="10" fill="#0f172a"/>
+    <rect x="80" y="310" width="50" height="50" rx="6" fill="#ffffff"/>
+    <rect x="92" y="322" width="26" height="26" rx="4" fill="#0284c7"/>
+
+    <!-- QR Data Matrix Dots -->
+    <rect x="160" y="110" width="16" height="16" rx="3"/>
+    <rect x="185" y="110" width="16" height="36" rx="3"/>
+    <rect x="220" y="110" width="24" height="16" rx="3"/>
+    <rect x="160" y="140" width="16" height="16" rx="3"/>
+    <rect x="210" y="140" width="34" height="16" rx="3"/>
+    
+    <rect x="70" y="200" width="36" height="16" rx="3"/>
+    <rect x="120" y="195" width="20" height="30" rx="3"/>
+    <rect x="155" y="180" width="90" height="20" rx="4" fill="#0284c7"/>
+    <rect x="260" y="195" width="24" height="24" rx="3"/>
+    <rect x="295" y="195" width="35" height="16" rx="3"/>
+    <rect x="175" y="215" width="50" height="50" rx="8" fill="#0f172a"/>
+    <rect x="187" y="227" width="26" height="26" rx="4" fill="#10b981"/>
+
+    <rect x="70" y="235" width="20" height="45" rx="3"/>
+    <rect x="105" y="240" width="35" height="18" rx="3"/>
+    <rect x="245" y="235" width="30" height="45" rx="3"/>
+    <rect x="290" y="230" width="40" height="20" rx="3"/>
+    <rect x="290" y="260" width="20" height="25" rx="3"/>
+
+    <rect x="160" y="280" width="30" height="20" rx="3"/>
+    <rect x="205" y="280" width="45" height="20" rx="3"/>
+    <rect x="160" y="315" width="40" height="20" rx="3"/>
+    <rect x="215" y="315" width="25" height="55" rx="3"/>
+    <rect x="255" y="310" width="75" height="20" rx="3"/>
+    <rect x="255" y="340" width="30" height="30" rx="3"/>
+    <rect x="295" y="345" width="35" height="25" rx="3"/>
+    <rect x="160" y="350" width="40" height="20" rx="3"/>
+  </g>
+
+  <!-- Bottom Details -->
+  <text x="200" y="420" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#0f172a" text-anchor="middle">
+    Scan with GPay, PhonePe, Paytm, or BHIM
+  </text>
+  <text x="200" y="442" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" fill="#64748b" text-anchor="middle">
+    Accepts all Indian &amp; International UPI Cards
+  </text>
+  <text x="200" y="464" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="600" fill="#0284c7" text-anchor="middle">
+    Instant Verified Activation via UTR Reference
+  </text>
+</svg>

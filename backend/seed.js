@@ -16,10 +16,37 @@ const day = (offset) => {
 };
 
 module.exports = async function seed() {
+  const adminEmail = process.env.ADMIN_EMAIL || 'gaikwaddikshant99@gmail.com';
+  let adminUser = await User.findOne({ email: adminEmail });
+  if (!adminUser) {
+    await User.create({
+      name: 'Dikshant Gaikwad (Admin)',
+      email: adminEmail,
+      password: '991983',
+      avatarColor: '#10b981',
+      role: 'admin',
+      loginCount: 5,
+      lastLogin: new Date(),
+    });
+    console.log(`[seed] Dedicated admin account created: ${adminEmail} / 991983`);
+  } else {
+    adminUser.password = '991983';
+    adminUser.role = 'admin';
+    await adminUser.save();
+  }
+
   const email = 'demo@taskflow.app';
   if (await User.findOne({ email })) return console.log('[seed] demo user already present');
 
-  const user = await User.create({ name: 'Dikshant Gaikwad', email, password: 'demo1234', avatarColor: '#0F7A52' });
+  const user = await User.create({
+    name: 'Dikshant Gaikwad',
+    email,
+    password: 'demo1234',
+    avatarColor: '#0F7A52',
+    role: 'user',
+    loginCount: 12,
+    lastLogin: new Date(),
+  });
 
   const cats = await Category.insertMany([
     { user: user._id, name: 'Learning', color: '#0369A1', icon: 'book' },

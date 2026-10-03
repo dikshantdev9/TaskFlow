@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pricing &amp; Pro Plans — TaskFlow</title>
+    <meta name="description" content="Upgrade to TaskFlow Pro for AI Task Breakdown, Unlimited Subtasks, Advanced Productivity Analytics and Priority Themes." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/task.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+    
+    <style>
+      .pricing-wrapper {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 20px 80px;
+      }
+
+      /* Hero Banner */
+      .pricing-hero {
+        text-align: center;
+        padding: 36px 16px 28px;
+        max-width: 760px;
+        margin: 0 auto;
+        position: relative;
+      }
+
+      .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 100px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+        background: rgba(16, 185, 129, 0.12);
+        color: #10b981;
+        border: 1px solid rgba(16, 185, 129, 0.28);
+      }
+
+      .pricing-hero h1 {
+        font-size: clamp(2rem, 1.4rem + 2vw, 2.75rem);
+        font-weight: 900;
+        letter-spacing: -0.035em;
+        line-height: 1.15;
+        margin-bottom: 14px;
+        color: var(--text-bright, var(--text));
+      }
+
+      .pricing-hero p {
+        font-size: 16px;
+        line-height: 1.6;
+        color: var(--text-muted);
+        margin: 0 auto;
+      }
+
+      /* Trust Metrics Ribbon */
+      .trust-ribbon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 24px;
+        flex-wrap: wrap;
+        margin: 24px auto 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+      }
+      .trust-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .trust-item svg {
+        color: #10b981;
+      }
+
+      /* 4-Column Pricing Grid */
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 22px;
+        margin-top: 40px;
+        align-items: stretch;
+      }
+
+      @media (max-width: 1100px) {
+        .pricing-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .pricing-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Individual Pricing Card */
+      .price-card {
+        border-radius: 20px;
+        padding: 32px 26px;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+      }
+
+      .price-card:hover {
+        transform: translateY(-4px);
+      }
+
+      /* Dark Theme Cards */
+      :root[data-theme="dark"] .price-card {
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #f8fafc;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      }
+      :root[data-theme="dark"] .price-card:hover {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Light Theme Cards */
+      :root[data-theme="light"] .price-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        color: #0f172a;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      }
+      :root[data-theme="light"] .price-card:hover {
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        border-color: #cbd5e1;
+      }
+
+      /* Featured / Highlighted Plan Card (Quarterly & Yearly) */
+      .price-card.featured-emerald {
+        border: 2px solid #10b981 !important;
+      }
+      :root[data-theme="dark"] .price-card.featured-emerald {
+        background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.16), rgba(15, 23, 42, 0.88));
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(16, 185, 129, 0.15);
+      }
+      :root[data-theme="light"] .price-card.featured-emerald {
+        background: radial-gradient(circle at top right, rgba(209, 250, 229, 0.5), #ffffff);
+        box-shadow: 0 16px 40px rgba(16, 185, 129, 0.12);
+      }
+
+      .price-card.featured-purple {
+        border: 2px solid #8b5cf6 !important;
+      }
+      :root[data-theme="dark"] .price-card.featured-purple {
+        background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.16), rgba(15, 23, 42, 0.88));
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 30px rgba(139, 92, 246, 0.15);
+      }
+      :root[data-theme="light"] .price-card.featured-purple {
+        background: radial-gradient(circle at top right, rgba(237, 233, 254, 0.6), #ffffff);
+        box-shadow: 0 16px 40px rgba(139, 92, 246, 0.12);
+      }
+
+      /* Plan Tag & Header */
+      .card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .plan-name {
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .discount-badge {
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 3px 8px;
+        border-radius: 20px;
+      }
+      .badge-emerald {
+        background: #10b981;
+        color: #022c22;
+      }
+      .badge-purple {
+        background: #8b5cf6;
+        color: #ffffff;
+      }
+      .badge-cyan {
+        background: rgba(6, 182, 212, 0.15);
+        color: #06b6d4;
+        border: 1px solid rgba(6, 182, 212, 0.3);
+      }
+
+      .plan-desc {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.45;
+        min-height: 38px;
+      }
+
+      /* Price Display */
+      .price-row {
+        margin: 20px 0 6px;
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+        font-family: 'JetBrains Mono', monospace;
+      }
+
+      .price-symbol {
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .price-num {
+        font-size: 38px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        line-height: 1;
+      }
+
+      .price-period {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+        font-family: var(--font-main, sans-serif);
+      }
+
+      .price-equiv {
+        font-size: 12px;
+        font-weight: 700;
+        min-height: 18px;
+        margin-bottom: 16px;
+      }
+
+      /* Features List */
+      .feature-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin: 16px 0 28px;
+        flex-grow: 1;
+      }
+
+      .feat-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 13.5px;
+        line-height: 1.4;
+        color: var(--text);
+      }
+
+      .feat-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 1px;
+      }
+      .feat-icon.check {
+        background: rgba(16, 185, 129, 0.15);
+        color: #10b981;
+      }
+      .feat-icon.cross {
+        background: rgba(100, 116, 139, 0.1);
+        color: #94a3b8;
+      }
+
+      /* Action Buttons */
+      .plan-btn {
+        margin-top: auto;
+        width: 100%;
+        height: 48px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 800;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        text-decoration: none;
+      }
+
+      .plan-btn:hover {
+        transform: translateY(-2px);
+      }
+      .plan-btn:active {
+        transform: translateY(0);
+      }
+
+      .btn-emerald {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: #022c22;
+        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+      }
+      .btn-emerald:hover {
+        box-shadow: 0 12px 26px rgba(16, 185, 129, 0.45);
+      }
+
+      .btn-purple {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+      }
+      .btn-purple:hover {
+        box-shadow: 0 12px 26px rgba(139, 92, 246, 0.45);
+      }
+
+      .btn-cyan {
+        background: transparent;
+        border: 1.5px solid #06b6d4;
+        color: #06b6d4;
+      }
+      .btn-cyan:hover {
+        background: rgba(6, 182, 212, 0.1);
+      }
+
+      .btn-current {
+        background: var(--surface-offset, rgba(100, 116, 139, 0.1));
+        color: var(--text-muted);
+        border: 1px solid var(--border);
+        cursor: default;
+        transform: none !important;
+      }
+
+      /* Modal QR Styles */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 16px;
+        animation: modalFadeIn 0.25s ease;
+      }
+
+      @keyframes modalFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      :root[data-theme="dark"] .qr-modal {
+        background: #0d1424;
+        color: #f8fafc;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 24px;
+        max-width: 460px;
+        width: 100%;
+        padding: 30px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      }
+      :root[data-theme="light"] .qr-modal {
+        background: #ffffff;
+        color: #0f172a;
+        border: 1px solid rgba(16, 185, 129, 0.35);
+        border-radius: 24px;
+        max-width: 460px;
+        width: 100%;
+        padding: 30px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div class="page" style="padding:var(--space-8)">
+        <div class="skeleton" style="height:60vh;border-radius:var(--radius-xl)"></div>
+      </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/pricing.js"></script>
+  </body>
+</html>

@@ -12,10 +12,33 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email'],
     },
+    phone: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     password: { type: String, required: [true, 'Password is required'], minlength: 6, select: false },
     avatarColor: { type: String, default: '#0F7A52' },
     bio: { type: String, default: '', maxlength: 240 },
     timezone: { type: String, default: 'Asia/Kolkata' },
+
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
+    loginCount: { type: Number, default: 0 },
+    lastLogin: { type: Date, default: null },
+
+    // Subscription & Pro Status
+    plan: { type: String, enum: ['free', 'pro', 'team'], default: 'free' },
+    isPro: { type: Boolean, default: false },
+    subscription: {
+      status: { type: String, enum: ['inactive', 'active', 'pending_approval', 'expired'], default: 'inactive' },
+      plan: { type: String, default: 'free' },
+      billingCycle: { type: String, enum: ['monthly', 'quarterly', 'yearly', 'lifetime'], default: 'monthly' },
+      transactionId: { type: String, default: null },
+      amount: { type: Number, default: 0 },
+      requestedAt: { type: Date, default: null },
+      approvedAt: { type: Date, default: null },
+      expiresAt: { type: Date, default: null },
+    },
 
     // Productivity streak
     streak: {
@@ -33,6 +56,8 @@ const userSchema = new mongoose.Schema(
         dueSoon: { type: Boolean, default: true },
         dailyDigest: { type: Boolean, default: true },
         streakReminder: { type: Boolean, default: true },
+        phoneAlerts: { type: Boolean, default: true },
+        pendingTaskSms: { type: Boolean, default: true },
       },
       compactMode: { type: Boolean, default: false },
     },

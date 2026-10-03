@@ -9,11 +9,12 @@
  * If you host the frontend separately, set window.TASKFLOW_API before
  * this script runs, e.g. <script>window.TASKFLOW_API='http://localhost:5000/api'</script>
  */
-const PROXY = '__PORT_5000__';
+const isLocal = !location.hostname || ['localhost', '127.0.0.1'].includes(location.hostname) || location.protocol === 'file:';
 
 const API_BASE = (
-  window.TASKFLOW_API ||
-  (PROXY.startsWith('__') ? `${location.origin}/api` : `${PROXY}/api`)
+  isLocal
+    ? (location.protocol === 'file:' ? 'http://localhost:5000/api' : `${location.origin}/api`)
+    : (window.TASKFLOW_API || (PROXY.startsWith('__') ? `${location.origin}/api` : `${PROXY}/api`))
 ).replace(/\/$/, '');
 
 /* -------------------------------------------------- storage --
@@ -131,6 +132,7 @@ const API = {
   put: (p, body) => API.request(p, { method: 'PUT', body }),
   patch: (p, body) => API.request(p, { method: 'PATCH', body }),
   del: (p) => API.request(p, { method: 'DELETE' }),
+  delete: (p) => API.request(p, { method: 'DELETE' }),
 
   /* ---- auth ---- */
   async signup(payload) {

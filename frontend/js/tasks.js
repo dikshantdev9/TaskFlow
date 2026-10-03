@@ -145,7 +145,12 @@ function taskModalHTML() {
           </div>
 
           <div class="field mt-6" id="tfSubtaskBlock">
-            <label class="label">Date-wise subtasks</label>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <label class="label" style="margin:0">Date-wise subtasks</label>
+              <button type="button" class="btn btn-sm" id="tfAiBreakdownBtn" style="background:linear-gradient(135deg,#10b981,#0284c7);color:#fff;border:none;font-weight:700;font-size:12px;padding:4px 10px;border-radius:8px;display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+                ${icon('sparkle', 13)} Generate with AI <span style="font-size:9px;background:rgba(0,0,0,0.3);padding:1px 5px;border-radius:6px;font-weight:800">PRO</span>
+              </button>
+            </div>
             <span class="field-hint" style="margin-bottom:var(--space-3);display:block">Break the task into daily steps. Progress = completed ÷ total.</span>
             <div class="draft-list" id="tfDrafts"></div>
             <button type="button" class="btn btn-secondary btn-sm mt-2" id="tfAddDraft">${icon('plus', 14)} Add subtask</button>
@@ -212,6 +217,53 @@ const TaskModal = {
 
   wire() {
     $('#tfAddDraft').onclick = () => TaskModal.addDraft({ title: '', date: nextDraftDate() });
+
+    const aiBtn = $('#tfAiBreakdownBtn');
+    if (aiBtn) {
+      aiBtn.onclick = async () => {
+        const title = $('#tfTitle').value.trim();
+        if (!title) {
+          return toast('Enter a task title first so AI can break it down!', 'error');
+        }
+
+        const originalText = aiBtn.innerHTML;
+        aiBtn.disabled = true;
+        aiBtn.innerHTML = `${icon('sparkle', 13)} Generating…`;
+
+        try {
+          const res = await API.post('/billing/ai-breakdown', {
+            title,
+            description: $('#tfDesc').value.trim(),
+            targetDays: 7,
+          });
+
+          if (res.success && res.subtasks && res.subtasks.length) {
+            const startDateStr = $('#tfStart').value || dateKey(new Date());
+            const baseDate = new Date(startDateStr);
+
+            res.subtasks.forEach((st) => {
+              const d = new Date(baseDate);
+              d.setDate(d.getDate() + (st.dayOffset || 0));
+              TaskModal.addDraft({
+                title: st.title,
+                date: dateKey(d),
+              });
+            });
+
+            toast(`✨ Generated ${res.subtasks.length} intelligent subtasks!`, 'success');
+          }
+        } catch (err) {
+          if (err.message && (err.message.includes('Pro') || err.message.includes('exclusive') || err.message.includes('upgrade'))) {
+            window.openUpgradeModal('AI Subtask Breakdown');
+          } else {
+            toast(err.message || 'AI generation failed', 'error');
+          }
+        } finally {
+          aiBtn.disabled = false;
+          aiBtn.innerHTML = originalText;
+        }
+      };
+    }
 
     $('#tfTagInput').addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ',') {

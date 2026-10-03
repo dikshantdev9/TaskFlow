@@ -1,6 +1,6 @@
-require('dotenv').config();
-
 const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -92,11 +92,22 @@ let dbPromise = null;
 
 function connectDatabase() {
   if (!dbPromise) {
-    dbPromise = connectDB().catch((err) => {
-      // Allow another request to retry the connection
-      dbPromise = null;
-      throw err;
-    });
+    dbPromise = connectDB()
+      .then(async (conn) => {
+        if (process.env.SEED_DEMO === 'true') {
+          try {
+            await require('./seed')();
+          } catch (seedErr) {
+            console.error('[db] Seed error:', seedErr);
+          }
+        }
+        return conn;
+      })
+      .catch((err) => {
+        // Allow another request to retry the connection
+        dbPromise = null;
+        throw err;
+      });
   }
 
   return dbPromise;
@@ -128,6 +139,8 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/tasks', require('./routes/taskRoutes'));
 app.use('/api/subtasks', require('./routes/subtaskRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/billing', require('./routes/billingRoutes'));
 
 // ============================================================
 // FRONTEND
@@ -141,6 +154,43 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(FRONTEND, 'index.html'));
 });
 
+// Prevent admin pages on User port 5000 (redirect to port 5001)
+app.get(['/admin-login.html', '/admin.html'], (req, res) => {
+  res.redirect(`http://${req.hostname}:5001`);
+});
+
+// ============================================================
+// ADMIN APP (PORT 5001)
+// ============================================================
+
+const adminApp = express();
+const ADMIN_PORT = process.env.ADMIN_PORT || 5001;
+
+adminApp.set('trust proxy', 1);
+adminApp.use(cors({ origin: true, credentials: true }));
+adminApp.use(express.json({ limit: '1mb' }));
+adminApp.use(express.urlencoded({ extended: true }));
+adminApp.use(cookieParser());
+
+adminApp.use('/api', async (req, res, next) => {
+  try {
+    await connectDatabase();
+    next();
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Database connection failed' });
+  }
+});
+
+adminApp.use('/api/admin', require('./routes/adminRoutes'));
+
+// Admin root route serves admin-login.html
+adminApp.get('/', (req, res) => {
+  res.sendFile(path.join(FRONTEND, 'admin-login.html'));
+});
+
+// Serve Admin Frontend static files
+adminApp.use(express.static(FRONTEND, { index: false }));
+
 // ============================================================
 // ERROR HANDLING
 // ============================================================
@@ -148,24 +198,20 @@ app.get('/', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
+adminApp.use(notFound);
+adminApp.use(errorHandler);
+
 // ============================================================
-// START SERVER
-// IMPORTANT:
-// Start Express FIRST.
-// MongoDB connection happens separately.
-// This prevents Render from waiting for MongoDB before
-// the HTTP server starts.
+// START SERVERS
 // ============================================================
 
 if (require.main === module) {
+  // 1. User Application Server
   app.listen(PORT, '0.0.0.0', async () => {
-    console.log(
-      `[server] TaskFlow running on port ${PORT}`
-    );
+    console.log(`[user-server] 👤 TaskFlow User Portal running on http://localhost:${PORT}`);
 
     try {
       await connectDatabase();
-
       console.log('[db] MongoDB connected successfully');
 
       if (process.env.SEED_DEMO === 'true') {
@@ -174,15 +220,13 @@ if (require.main === module) {
         console.log('[db] Demo data seeded successfully');
       }
     } catch (err) {
-      console.error(
-        '[db] Initial database connection failed:',
-        err.message
-      );
-
-      console.error(
-        '[db] The server is still running. API requests will retry the database connection.'
-      );
+      console.error('[db] Initial database connection failed:', err.message);
     }
+  });
+
+  // 2. Admin Portal Server
+  adminApp.listen(ADMIN_PORT, '0.0.0.0', () => {
+    console.log(`[admin-server] 🛡️ TaskFlow Admin Portal running on http://localhost:${ADMIN_PORT}`);
   });
 }
 
