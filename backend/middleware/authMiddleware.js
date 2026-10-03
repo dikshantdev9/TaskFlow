@@ -14,7 +14,8 @@ async function protect(req, res, next) {
       throw new Error('Not authorised — no token provided');
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const JWT_SECRET = process.env.JWT_SECRET || '98ee51da6536ff874401fbb2467c28673b795a626c533c6c71ea6727cad389d5';
+    const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) {
       res.status(401);

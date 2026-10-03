@@ -122,11 +122,8 @@ app.use('/api', async (req, res, next) => {
 
     res.status(500).json({
       success: false,
-      message: 'Database connection failed',
-      error:
-        process.env.NODE_ENV === 'development'
-          ? err.message
-          : undefined,
+      message: `Database connection error: ${err.message || 'Please verify MONGO_URI and IP access (0.0.0.0/0) in MongoDB Atlas.'}`,
+      error: err.message,
     });
   }
 });

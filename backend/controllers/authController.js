@@ -3,8 +3,10 @@ const User = require('../models/User');
 const Category = require('../models/Category');
 const { asyncHandler } = require('../middleware/errorMiddleware');
 
+const JWT_SECRET = process.env.JWT_SECRET || '98ee51da6536ff874401fbb2467c28673b795a626c533c6c71ea6727cad389d5';
+
 const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '30d' });
+  jwt.sign({ id }, JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '30d' });
 
 const DEFAULT_CATEGORIES = [
   { name: 'Learning', color: '#0369A1', icon: 'book' },
@@ -34,7 +36,7 @@ exports.signup = asyncHandler(async (req, res) => {
 
   // Check if first user or matching admin email
   const isFirstUser = (await User.countDocuments()) === 0;
-  const adminEmail = process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL.toLowerCase() : null;
+  const adminEmail = process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL.toLowerCase() : 'gaikwaddikshant99@gmail.com';
   const role = isFirstUser || (adminEmail && email.toLowerCase() === adminEmail) ? 'admin' : 'user';
 
   const user = await User.create({
@@ -59,14 +61,25 @@ exports.login = asyncHandler(async (req, res) => {
     throw new Error('Email and password are required');
   }
 
-  const user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
+  let user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
+
+  // If user not found and it is demo user or empty DB, auto-seed and try once
+  if (!user && (String(email).toLowerCase() === 'demo@taskflow.app' || (await User.countDocuments()) === 0)) {
+    try {
+      await require('../seed')();
+      user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
+    } catch (e) {
+      console.error('[auth] Auto-seed error:', e.message);
+    }
+  }
+
   if (!user || !(await user.matchPassword(password))) {
     res.status(401);
     throw new Error('Invalid email or password');
   }
 
   // Update login tracking and promote admin email if applicable
-  const adminEmail = (process.env.ADMIN_EMAIL || 'demo@taskflow.app').toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL || 'gaikwaddikshant99@gmail.com').toLowerCase();
   if (user.email.toLowerCase() === adminEmail) {
     user.role = 'admin';
   }

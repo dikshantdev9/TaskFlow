@@ -4,8 +4,10 @@ const Task = require('../models/Task');
 const Subtask = require('../models/Subtask');
 const { asyncHandler } = require('../middleware/errorMiddleware');
 
+const JWT_SECRET = process.env.JWT_SECRET || '98ee51da6536ff874401fbb2467c28673b795a626c533c6c71ea6727cad389d5';
+
 const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '30d' });
+  jwt.sign({ id }, JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN || '30d' });
 
 // @route   POST /api/admin/login
 // @desc    Exclusive Admin Login Endpoint
@@ -16,13 +18,24 @@ exports.adminLogin = asyncHandler(async (req, res) => {
     throw new Error('Admin email and password are required');
   }
 
-  const user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
+  let user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
+  
+  // If user not found, try auto-seeding admin credentials
+  if (!user) {
+    try {
+      await require('../seed')();
+      user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
+    } catch (e) {
+      console.error('[admin] Auto-seed error:', e.message);
+    }
+  }
+
   if (!user || !(await user.matchPassword(password))) {
     res.status(401);
     throw new Error('Invalid administrator credentials');
   }
 
-  const adminEmail = (process.env.ADMIN_EMAIL || 'admin@taskflow.app').toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL || 'gaikwaddikshant99@gmail.com').toLowerCase();
   const isAdmin = user.role === 'admin' || user.email.toLowerCase() === adminEmail;
 
   if (!isAdmin) {
