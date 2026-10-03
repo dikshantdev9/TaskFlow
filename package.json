@@ -1,13 +1,21 @@
 {
   "name": "taskflow",
+  "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "backend"
-  ],
+  "main": "api/index.js",
   "scripts": {
-    "dev": "cd backend && npm run dev",
-    "start": "cd backend && npm start",
-    "build": "node -e \"console.log('TaskFlow build step not required for Vercel deployment.')\"",
-    "vercel-build": "npm run build"
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.9.1",
+    "mongodb-memory-server": "^11.2.0"
   }
 }
