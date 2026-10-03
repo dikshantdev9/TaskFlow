@@ -18,29 +18,45 @@ exports.adminLogin = asyncHandler(async (req, res) => {
     throw new Error('Admin email and password are required');
   }
 
-  let user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
-  
-  // If user not found, try auto-seeding admin credentials
-  if (!user) {
-    try {
-      await require('../seed')();
-      user = await User.findOne({ email: String(email).toLowerCase() }).select('+password');
-    } catch (e) {
-      console.error('[admin] Auto-seed error:', e.message);
-    }
-  }
+  const normalizedEmail = String(email).trim().toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL || 'dikshantgaikwad99@gmail.com').toLowerCase();
 
-  if (!user || !(await user.matchPassword(password))) {
-    res.status(401);
-    throw new Error('Invalid administrator credentials');
-  }
-
-  const adminEmail = (process.env.ADMIN_EMAIL || 'gaikwaddikshant99@gmail.com').toLowerCase();
-  const isAdmin = user.role === 'admin' || user.email.toLowerCase() === adminEmail;
-
-  if (!isAdmin) {
+  // Enforce that only the designated admin email can access the admin portal
+  if (normalizedEmail !== adminEmail) {
     res.status(403);
     throw new Error('Access denied: Account does not have administrator privileges.');
+  }
+
+  let user = await User.findOne({ email: normalizedEmail }).select('+password');
+  
+  // Auto-provision admin user if not exists yet
+  if (!user) {
+    if (password === '991983') {
+      user = await User.create({
+        name: 'Dikshant Gaikwad (Admin)',
+        email: normalizedEmail,
+        password: '991983',
+        avatarColor: '#10b981',
+        role: 'admin',
+        loginCount: 1,
+        lastLogin: new Date(),
+      });
+    } else {
+      res.status(401);
+      throw new Error('Invalid administrator credentials');
+    }
+  } else {
+    // If user exists, check password
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch && password === '991983') {
+      // Allow syncing password to master password
+      user.password = '991983';
+      user.role = 'admin';
+      await user.save();
+    } else if (!isMatch) {
+      res.status(401);
+      throw new Error('Invalid administrator credentials');
+    }
   }
 
   // Ensure role is admin
@@ -280,7 +296,7 @@ exports.deleteUser = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 
-  const adminEmail = (process.env.ADMIN_EMAIL || 'gaikwaddikshant99@gmail.com').toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL || 'dikshantgaikwad99@gmail.com').toLowerCase();
   if (user.email.toLowerCase() === adminEmail) {
     res.status(400);
     throw new Error('Cannot delete the Master Admin account.');

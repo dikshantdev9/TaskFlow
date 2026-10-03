@@ -36,7 +36,7 @@ exports.signup = asyncHandler(async (req, res) => {
 
   // Check if first user or matching admin email
   const isFirstUser = (await User.countDocuments()) === 0;
-  const adminEmail = process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL.toLowerCase() : 'gaikwaddikshant99@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL.toLowerCase() : 'dikshantgaikwad99@gmail.com';
   const role = isFirstUser || (adminEmail && email.toLowerCase() === adminEmail) ? 'admin' : 'user';
 
   const user = await User.create({
@@ -79,7 +79,7 @@ exports.login = asyncHandler(async (req, res) => {
   }
 
   // Update login tracking and promote admin email if applicable
-  const adminEmail = (process.env.ADMIN_EMAIL || 'gaikwaddikshant99@gmail.com').toLowerCase();
+  const adminEmail = (process.env.ADMIN_EMAIL || 'dikshantgaikwad99@gmail.com').toLowerCase();
   if (user.email.toLowerCase() === adminEmail) {
     user.role = 'admin';
   }

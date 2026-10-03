@@ -428,7 +428,7 @@
                 <option value="pro" ${u.isPro ? 'selected' : ''}>Pro Tier</option>
               </select>
               ${
-                u.email.toLowerCase() === 'gaikwaddikshant99@gmail.com' || u.role === 'admin'
+                u.email.toLowerCase() === 'dikshantgaikwad99@gmail.com' || u.role === 'admin'
                   ? '<span style="font-size:11px;color:var(--text-muted);font-weight:600;padding:4px 8px;background:rgba(16,185,129,0.1);border-radius:6px;color:#10b981">Master</span>'
                   : `<button class="btn btn-outline btn-xs delete-user-btn" data-user="${u.id}" data-name="${esc(u.name)}" style="color:#ef4444;border-color:rgba(239,68,68,0.4);font-size:11px;padding:3px 8px;border-radius:6px" title="Permanently delete user and their tasks">
                       🗑️ Delete

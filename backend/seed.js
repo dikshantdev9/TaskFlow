@@ -16,7 +16,7 @@ const day = (offset) => {
 };
 
 module.exports = async function seed() {
-  const adminEmail = process.env.ADMIN_EMAIL || 'gaikwaddikshant99@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || 'dikshantgaikwad99@gmail.com';
   let adminUser = await User.findOne({ email: adminEmail });
   if (!adminUser) {
     await User.create({
