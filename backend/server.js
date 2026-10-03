@@ -154,10 +154,12 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(FRONTEND, 'index.html'));
 });
 
-// Prevent admin pages on User port 5000 (redirect to port 5001)
-app.get(['/admin-login.html', '/admin.html'], (req, res) => {
-  res.redirect(`http://${req.hostname}:5001`);
-});
+// Prevent admin pages on User port 5000 only in local multi-port mode (allow on Vercel/serverless)
+if (!process.env.VERCEL) {
+  app.get(['/admin-login.html', '/admin.html'], (req, res) => {
+    res.redirect(`http://${req.hostname}:5001`);
+  });
+}
 
 // ============================================================
 // ADMIN APP (PORT 5001)
